@@ -1,0 +1,157 @@
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Inscripción a Cursos</h2>
+
+  <!-- Formulario -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Nueva Inscripción</h5>
+
+      <div class="row g-3">
+
+        <!-- DNI: solo números, 7-8 dígitos -->
+        <div class="col-md-4">
+          <label class="form-label">DNI</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="dni"
+            maxlength="8"
+            pattern="\d{7,8}"
+            placeholder="Ej: 35123456"
+            (input)="dni = dni.replace(/\D/g, '')">
+          @if (dni.length > 0 && !dniValido()) {
+            <div class="text-danger small mt-1">El DNI debe tener 7 u 8 dígitos numéricos.</div>
+          }
+        </div>
+
+        <!-- Email -->
+        <div class="col-md-4">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" [(ngModel)]="email" placeholder="alumno@mail.com">
+        </div>
+
+        <!-- Categoría -->
+        <div class="col-md-4">
+          <label class="form-label">Categoría de Alumno</label>
+          <select class="form-select" [(ngModel)]="categoriaAlumno">
+            <option [value]="0" disabled>Seleccionar...</option>
+            <option [value]="1">Estudiante (35% desc.)</option>
+            <option [value]="2">Egresado (50% desc.)</option>
+            <option [value]="3">Particular (sin desc.)</option>
+          </select>
+        </div>
+
+        <!-- Curso -->
+        <div class="col-md-6">
+          <label class="form-label">Curso</label>
+          <select class="form-select" [(ngModel)]="cursoSeleccionado">
+            <option [ngValue]="null" disabled>Seleccionar curso...</option>
+            @for (c of cursos; track c.nombre) {
+              <option [ngValue]="c">{{ c.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Precio base (solo lectura) -->
+        <div class="col-md-3">
+          <label class="form-label">Precio del Curso</label>
+          <input
+            type="text"
+            class="form-control"
+            [value]="precioBase | currency:'ARS':'symbol':'1.2-2'"
+            readonly>
+        </div>
+
+      </div>
+
+      <!-- Resumen de precio con descuento -->
+      @if (mostrarResumen) {
+        <div class="mt-4 p-3 bg-light rounded border">
+          <div class="row text-center">
+            <div class="col-4">
+              <div class="text-muted small">Precio base</div>
+              <div class="fw-bold">{{ precioBase | currency:'ARS':'symbol':'1.2-2' }}</div>
+            </div>
+            <div class="col-4">
+              <div class="text-muted small">Descuento ({{ descuentoPorcentaje }}%)</div>
+              <div class="fw-bold text-danger">- {{ montoDescuento | currency:'ARS':'symbol':'1.2-2' }}</div>
+            </div>
+            <div class="col-4">
+              <div class="text-muted small">Total a abonar</div>
+              <div class="fw-bold fs-5 text-success">{{ precioFinal | currency:'ARS':'symbol':'1.2-2' }}</div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="mt-4">
+        <button class="btn btn-primary" (click)="registrar()" [disabled]="!formularioValido">
+          REGISTRAR
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Listado de inscripciones -->
+  <h4 class="mb-3">Inscripciones Registradas</h4>
+  @if (inscripciones.length === 0) {
+    <p class="text-muted">No hay inscripciones aún.</p>
+  } @else {
+    <div class="table-responsive mb-5">
+      <table class="table table-striped table-bordered align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>DNI</th>
+            <th>Email</th>
+            <th>Curso</th>
+            <th>Categoría</th>
+            <th>Precio Base</th>
+            <th>Precio Final</th>
+            <th>Fecha</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ins of inscripciones; track ins.id) {
+            <tr>
+              <td>{{ ins.id }}</td>
+              <td>{{ ins.dni }}</td>
+              <td>{{ ins.email }}</td>
+              <td>{{ ins.curso }}</td>
+              <td>{{ nombreCategoria(ins.categoriaAlumno) }}</td>
+              <td>{{ ins.precio | currency:'ARS':'symbol':'1.2-2' }}</td>
+              <td class="fw-bold text-success">{{ ins.precioFinal | currency:'ARS':'symbol':'1.2-2' }}</td>
+              <td>{{ ins.fechaInscripcion | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <button class="btn btn-sm btn-danger" (click)="eliminar(ins.id)">Eliminar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Resumen por categoría -->
+    <h4 class="mb-3">Resumen por Categoría</h4>
+    <div class="row mb-3">
+      @for (cat of resumen; track cat.nombre) {
+        <div class="col-md-4 mb-2">
+          <div class="card border-secondary">
+            <div class="card-body text-center">
+              <h6 class="card-title">{{ cat.nombre }}</h6>
+              <p class="mb-1">Cantidad: <strong>{{ cat.cantidad }}</strong></p>
+              <p class="mb-0">Total: <strong>{{ cat.total | currency:'ARS':'symbol':'1.2-2' }}</strong></p>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="alert alert-info fw-bold text-center fs-5">
+      Total General: {{ totalGeneral | currency:'ARS':'symbol':'1.2-2' }}
+    </div>
+  }
+
+</div>

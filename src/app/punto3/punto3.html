@@ -1,0 +1,47 @@
+<div class="container mt-4">
+  <h2 class="text-center mb-3">Juego de Memoria</h2>
+
+  <!-- Controles -->
+  <div class="d-flex justify-content-center gap-3 mb-4">
+    <button class="btn btn-warning" (click)="reiniciar()">REINICIAR</button>
+    <button class="btn btn-success" (click)="iniciar()" [disabled]="juegoIniciado && !juegoTerminado">
+      INICIAR
+    </button>
+    <button
+      class="btn btn-primary"
+      (click)="intentar()"
+      [disabled]="!juegoIniciado || juegoTerminado || intentosRestantes <= 0 || puedeVoltear">
+      INTENTAR ({{ intentosRestantes }})
+    </button>
+  </div>
+
+  <!-- Mensaje de resultado -->
+  @if (mensaje) {
+    <div class="alert text-center fw-bold"
+         [class.alert-success]="mensaje.includes('Ganaste')"
+         [class.alert-danger]="!mensaje.includes('Ganaste')">
+      {{ mensaje }}
+    </div>
+  }
+
+  <!-- Tablero -->
+  @if (juegoIniciado) {
+    <div class="tablero mx-auto">
+      @for (carta of tablero; track carta.id) {
+        <div
+          class="carta"
+          [class.volteada]="carta.volteada"
+          [class.encontrada]="carta.encontrada"
+          (click)="voltearCarta(carta)">
+          @if (!carta.volteada && !carta.encontrada) {
+            <span class="cara-oculta">?</span>
+          } @else {
+            <span class="cara-emoji">{{ carta.emoji }}</span>
+          }
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="text-center text-muted mt-5">Presioná INICIAR para comenzar el juego.</p>
+  }
+</div>

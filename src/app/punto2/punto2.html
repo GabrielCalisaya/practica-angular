@@ -1,0 +1,67 @@
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Productos Destacados</h2>
+
+  <!-- Botón carrito -->
+  <div class="text-end mb-3">
+    <button class="btn btn-success" (click)="mostrarModal = true">
+      Ver Carrito ({{ carrito.length }})
+    </button>
+  </div>
+
+  <!-- Grid de productos -->
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-4">
+    @for (producto of productos; track producto.nombre) {
+      <div class="col">
+        <div class="card h-100 shadow-sm">
+          <img [src]="producto.img" class="card-img-top product-img" alt="{{ producto.nombre }}">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ producto.nombre }}</h5>
+            <p class="card-text text-muted flex-grow-1">{{ producto.descripcion }}</p>
+            <p class="fw-bold fs-5 text-primary mb-0">${{ producto.precio }}</p>
+          </div>
+          <div class="card-footer bg-transparent border-top-0 pb-3">
+            <button
+              class="btn w-100"
+              [class.btn-primary]="!estaEnCarrito(producto)"
+              [class.btn-success]="estaEnCarrito(producto)"
+              [disabled]="estaEnCarrito(producto)"
+              (click)="agregarAlCarrito(producto)">
+              {{ estaEnCarrito(producto) ? 'En carrito ✓' : 'Agregar al carrito' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Modal carrito -->
+  @if (mostrarModal) {
+    <div class="modal d-block" style="background:rgba(0,0,0,0.5)">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Tu Carrito</h5>
+            <button class="btn-close" (click)="mostrarModal = false"></button>
+          </div>
+          <div class="modal-body">
+            @if (carrito.length === 0) {
+              <p>El carrito está vacío</p>
+            }
+            <ul class="list-group">
+              @for (item of carrito; track item.nombre) {
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>{{ item.nombre }}</span>
+                  <span>${{ item.precio }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <strong>Total: ${{ total }}</strong>
+            <button class="btn btn-secondary" (click)="mostrarModal = false">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
